@@ -17,14 +17,12 @@ class TaskController extends Controller
         $tasks=Task::all();
         return view('user.home',compact('tasks'));
     }
-
     /**
      * Show the form for creating a new resource.
      */
     public function create()
     {
         //
-        dd(Auth::user());
         return view('user.task_create');
     }
 
@@ -33,11 +31,10 @@ class TaskController extends Controller
      */
     public function store(Request $request)
     {
-        //
         Task::query()->create([
             'title'=>$request->title,
-            'description'=>$request->description,
-            'author_id'=> Auth::user()->id
+            'description'=>$request->description?$request->description:null,
+            'author_id'=>Auth::user()->id
         ]);
         return redirect(route("user_home"));
     }
