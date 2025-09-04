@@ -14,8 +14,8 @@ class TaskController extends Controller
     public function index()
     {
         //
-        $tasks=Task::all();
-        return view('user.home',compact('tasks'));
+        $tasks = Task::all();
+        return view('user.home', compact('tasks'));
     }
     /**
      * Show the form for creating a new resource.
@@ -31,10 +31,15 @@ class TaskController extends Controller
      */
     public function store(Request $request)
     {
+        $request->validate([
+            'title' => 'required',
+        ], [
+            'title.required' => '入力必須です',
+        ]);
         Task::query()->create([
-            'title'=>$request->title,
-            'description'=>$request->description?$request->description:null,
-            'author_id'=>Auth::user()->id
+            'title' => $request->title,
+            'description' => $request->description ? $request->description : null,
+            'author_id' => Auth::user()->id
         ]);
         return redirect(route("user_home"));
     }
@@ -53,6 +58,8 @@ class TaskController extends Controller
     public function edit(string $id)
     {
         //
+        $task = Task::query()->find($id);
+        return view('user.task_edit', compact('task'));
     }
 
     /**
@@ -61,6 +68,18 @@ class TaskController extends Controller
     public function update(Request $request, string $id)
     {
         //
+        $request->validate([
+            'title' => 'required',
+        ], [
+            'title.required' => '入力必須です',
+        ]);
+        $task = Task::query()->find($id);
+        $task->update([
+            'title' => $request->title,
+            'description' => $request->description,
+            'completed' => $request->completed == 'on' ? 1 : 0
+        ]);
+        return redirect(route('user_home'));
     }
 
     /**
@@ -69,5 +88,8 @@ class TaskController extends Controller
     public function destroy(string $id)
     {
         //
+        $task = Task::query()->find($id);
+        $task->delete();
+        return redirect(route('user_home'));
     }
 }
